@@ -33,25 +33,37 @@ E_modulus = 100 * 10**9
 
 #------ Create support vectors
 
+F_z_d = np.array([0,0,-P_z/3])
 
 L_d_vec_list = []
 
+
 for i in range (3):
     Alpha_i = i * Alpha_d
-    L_d_vec = np.array([L_d*np.sin(Phi_d),
-                     L_d*np.sin(Phi_d)*np.sin(Alpha_i),
-                       L_d*np.cos(Phi_d)])
+    L_d_vec = np.array([L_d*np.cos(Phi_d),
+                     L_d*np.cos(Phi_d)*np.sin(Alpha_i),
+                       L_d*np.sin(Phi_d)])
 
     L_d_vec_list.append(L_d_vec)
 
-print(L_d_vec_list)
+#Assume that the side bars do not apply any z force
+#Decompose forces on bottom and top bars
 
+F_ax_d_list = [] 
+F_trans_d_list = []
+
+for attachment in L_d_vec_list:
+    F_ax_d = attachment * np.dot(F_z_d,attachment)/np.dot(attachment,attachment)
+    F_trans_d = F_z_d - F_ax_d
+    
+    F_ax_d_list.append(F_ax_d)
+    F_trans_d_list.append(F_trans_d)
+
+print(F_ax_d_list)
+#print(F_trans_d_list)
+
+#Assume the side bars apply all the xy force
 #------ Deflection for mid section
-
-
-
-
-L_d = 0.25 #[m]
 
 
 
@@ -66,7 +78,7 @@ L_d = 0.25 #[m]
 
 # F_ax_d[i] = 
 
-# F_ax_d = L_mid * np.dot(F_d,L_mid)/np.dot(L_mid,L_mid)
+# 
 # F_per_d = F_d - F_ax_d
 
 # F_mid = 
