@@ -178,7 +178,6 @@ def Attachment_design(P_x,P_y,P_z,D_outer,L,n_att,att_location,att_type):
   return L_vec_list,Abs_F_ax_list, Abs_F_trans_list,F_ax_list, F_trans_list, D_min, Mass_att,Sigma
   
 
-
 D_xy_max = 0.03
 L = 0.25
 P_x = 1000
