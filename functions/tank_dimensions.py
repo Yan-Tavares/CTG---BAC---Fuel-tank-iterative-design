@@ -1,8 +1,8 @@
 import math
 
 #Constants
-R       = 0.3                    #tank radius, [m]
-L       = 0.3 + 2 * R                  #tank length, [m]
+R       = 0.48                   #tank radius, [m]
+L       = 2 * R                  #tank length, [m]
 nu      = 1/3                    #Poisson's ratio
 SF      = 2                      #safety factor 2 as in Intro to Aero II
 p_int   = 30 * 10**5             #internal pressure of tank, [Pa]
@@ -48,8 +48,8 @@ for Material in Material_list:
 
         p_max_3 = (K_1c**2) / (Y**2 * R * math.pi * Sigma_y)             #leak-before-break condition to avoid explosions
 
-        Sigma_max = max(Sigma_circ, Sigma_long, Sigma_sphere)
-        p_max = max(p_max_1, p_max_2, p_max_3)
+        Sigma_max = max(Sigma_circ, Sigma_long, Sigma_sphere)            #design for the most critical stress
+        p_max = max(p_max_1, p_max_2, p_max_3)                           #design for the most critical pressure
         
         if Sigma_max > Sigma_y or p_int > p_max:
             t_cylinder = t_cylinder + dt
