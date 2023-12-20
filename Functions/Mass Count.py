@@ -14,26 +14,26 @@ p = 101325
 v = 0.333
 lamda = 1 
 
-stepsize = 0.0005
-total_mass = 0
+stepsize = 0.0005 
+total_mass = 374-26.654 
 
-mass_list = [0.05,0.15, 10, 3,5.65,4.54,4.25] ### Data from Yan 
+mass_list = [0.05,0.15, 10, 3,5.65,4.54,4.25] ### Data from Yan, to be updated
 
 def Mass_count(mass_list): #should get the mass of the attachments as a list, 5.4, talk to Yan. 
     # Iterate in 5.3, talk to Paris. 
-    total_mass = sum(mass_list)  
+    sum_from_list = sum(mass_list)  
+    total_mass = 374-26.654 + sum_from_list
     return total_mass 
-print("Total mass is", total_mass) 
+print('The inital thickness is', t1, '[m],', t1*1000, '[mm]')  
 
 # def Check_failure(t):  
 #     return fc.failure1 
 
 # Compare t1 and t2 with internal pressure  
 
-biggest_t1= Paris.t1
+biggest_t1= Paris.t1 
 
-
-while not Paris.Check_failure(t1)[0] and Paris.t1 >= 0:
+while not Paris.Check_failure(t1)[0] and Paris.t1 >= 0: 
     if t1 < 0.001 + stepsize: 
         break 
 
@@ -51,4 +51,6 @@ t1 = round(t1, 9)
 
 print('The final thickness is', t1, '[m],' , t1*1000, '[mm]')  
 
-print("Total_mass is", Mass_count(mass_list), '[kg]') 
+print("Total mass is", Mass_count(mass_list), '[kg]') 
+
+
