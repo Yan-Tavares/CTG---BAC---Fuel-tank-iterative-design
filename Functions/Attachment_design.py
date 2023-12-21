@@ -4,7 +4,7 @@ import numpy as np
 
 def Normal_Stress(F_ax,F_trans,Length,A,I,s_max):
   Nominal_stress = F_ax/A
-  Max_Bending_stress = F_trans * s_max / I
+  Max_Bending_stress = F_trans * Length * s_max / I
   Max_Normal_stress = Nominal_stress + Max_Bending_stress
   
   return Max_Normal_stress
@@ -32,32 +32,35 @@ def Attachment_load_calculator(Force_vector,Att_vector_list):
 def Minimal_variable_dimension(Rho, Sigma_yield, F_ax, F_trans, Length, Def_max_dimension, att_type):
 
   if att_type == "H_Cylinder":
-    R_inner_stepsize = 0.0005
+    R_inner_stepsize = 0.0002
     R_outer = Def_max_dimension
-    R_inner = Def_max_dimension - R_inner_stepsize
+    R_inner = Def_max_dimension - 0.001
 
     A = (np.pi)*(R_outer**2 - R_inner**2)
     I = (np.pi/4)*(R_outer**4 - R_inner**4)
     Sigma = Normal_Stress(F_ax,F_trans,Length,A,I,R_outer)
 
+    print(Sigma)
+    
     while Sigma_yield <= Sigma:
-      Sigma = Normal_Stress(F_ax,F_trans,Length,A,I,R_outer)
-
+    
       R_inner -= R_inner_stepsize
       A = (np.pi)*(R_outer**2 - R_inner**2)
       I = (np.pi/4)*(R_outer**4 - R_inner**4)
-      
+
+      Sigma = Normal_Stress(F_ax,F_trans,Length,A,I,R_outer)
     
     Mass = Rho * Length * A
     return R_inner, Mass, Sigma
 
   if att_type == "I_Beam":
-    D_inner_stepsize = 0.0005
+    D_inner_stepsize = 0.0002
     D_outer = Def_max_dimension
-    D_inner = Def_max_dimension - D_inner_stepsize
+    D_inner = Def_max_dimension - 0.001
     
     A = Def_max_dimension*(Def_max_dimension - D_inner)
     I = 2* (1/12 * Def_max_dimension*(Def_max_dimension - D_inner)**3 + A * (Def_max_dimension - D_inner/2)**2)
+    
     Sigma = Normal_Stress(F_ax,F_trans,Length,A,I,D_outer)
 
     while Sigma_yield <= Sigma:
@@ -65,7 +68,6 @@ def Minimal_variable_dimension(Rho, Sigma_yield, F_ax, F_trans, Length, Def_max_
 
       A = Def_max_dimension*(Def_max_dimension - D_inner)
       I = 2* (1/12 * Def_max_dimension*(Def_max_dimension - D_inner)**3 + A * (Def_max_dimension - D_inner/2)**2)
-      
 
       Sigma = Normal_Stress(F_ax,F_trans,Length,A,I,D_outer)
 
@@ -76,8 +78,8 @@ def Minimal_variable_dimension(Rho, Sigma_yield, F_ax, F_trans, Length, Def_max_
 
 def Attachment_design(P_x,P_y,P_z,D_outer,L,n_att,att_location,att_type):
   E_modulus = 100 * 10**9
-  Sigma_yield = 550*10**6
-  Rho = 7.85*10**3 #Steel_8630
+  Sigma_yield = 1480*10**6 #Carbon Fiber - Epoxy UD
+  Rho = 1.580*10**3 #Carbon Fiber - Epoxy UD
 
   SF_xy = 1.5
   SF_z = 1.5
@@ -90,7 +92,7 @@ def Attachment_design(P_x,P_y,P_z,D_outer,L,n_att,att_location,att_type):
 
 
   Phi_u = np.radians(-40)
-  Phi_d = np.radians(0)
+  Phi_d = np.radians(90)
 
   if att_location == "Upper":
     
@@ -173,10 +175,8 @@ def Attachment_design(P_x,P_y,P_z,D_outer,L,n_att,att_location,att_type):
     #----------------- CALCULATE AXIAL AND TRANSVERSAL LOADS
     Abs_F_ax_list, Abs_F_trans_list,F_ax_list, F_trans_list = Attachment_load_calculator(F_z_d,L_d_vec_list)
 
-
   D_min, Mass_att,Sigma = Minimal_variable_dimension(Rho, Sigma_yield, max(Abs_F_ax_list), max(Abs_F_trans_list), L, D_outer, att_type)
-
-
+  
   return L_vec_list,Abs_F_ax_list, Abs_F_trans_list,F_ax_list, F_trans_list, D_min, Mass_att,Sigma
   
 

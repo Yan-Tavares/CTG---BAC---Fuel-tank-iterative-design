@@ -22,7 +22,7 @@ def Force_calculator(m_tank_dry,m_attachment):
     return F_x_max,F_y_max,F_z_max
 
 def Attachment_mass_calc(F_x_max,F_y_max,F_z_max):
-    D_max_crossection = 0.10
+    D_max_crossection = 0.02
 
     n_att_upper = 3
     L_att_upper = 0.2650
@@ -33,11 +33,14 @@ def Attachment_mass_calc(F_x_max,F_y_max,F_z_max):
     n_att_lower = 3
     L_att_lower = 0.1725
 
-    m_att_upper = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_upper  , 3 ,"Upper","H_Cylinder")[6]*n_att_upper
-    m_att_middle = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_middle  , 3 ,"Middle","I_Beam")[6]*n_att_midle
-    m_att_lower = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_lower  , 3 ,"Bottom","H_Cylinder")[6]*n_att_lower
+    m_att_upper, D_min_upper = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_upper  , 3 ,"Upper","H_Cylinder")[6]*n_att_upper, Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_upper  , 3 ,"Upper","H_Cylinder")[5]
+    m_att_middle, D_min_middle = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_middle  , 3 ,"Middle","I_Beam")[6]*n_att_midle, Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_middle  , 3 ,"Middle","I_Beam")[5]
 
-    return m_att_upper,m_att_middle,m_att_lower
+    m_att_lower, D_min_lower = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_lower  , 3 ,"Bottom","H_Cylinder")[6]*n_att_lower, Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_lower  , 3 ,"Bottom","H_Cylinder")[5]
+
+    
+
+    return m_att_upper,m_att_middle,m_att_lower,D_min_upper,D_min_middle,D_min_lower
 
 
 def Mass_tank_calculation(Rho,t1,R):
@@ -46,10 +49,8 @@ def Mass_tank_calculation(Rho,t1,R):
     return m
 
 
- #Design space is a square which has a side of D_max_crossection
-
 #----------------- IMPUT PARAMETERS
-
+D_max_crossection = 0.02
 Rho = 2.84*10**3 # AL-2219: 2.85*10**
 E = 73.8*10**9 # AL-2219: 73.8*10**9
 R = 0.33
@@ -59,10 +60,6 @@ biggest_t1 = t1
 t1_stepsize = 0.0001
 
 #----------------- ITERATIVE DESIGN
-
-
-
-
 
 m_tank_dry = Mass_tank_calculation(Rho,t1,R)
 
@@ -84,7 +81,7 @@ print('Sigma applied', round(sigma_applied *10**(-6),4), '[Mpa]')
 print("\n")
 
 
-steps = 2
+steps = 1
 
 for i in range (0,steps):
 
@@ -106,43 +103,50 @@ for i in range (0,steps):
 
     m_tank_dry = Mass_tank_calculation(Rho,t1,R)
     F_x_max,F_y_max,F_z_max = Force_calculator(m_tank_dry,m_att_tot)
-    m_att_tot = sum(Attachment_mass_calc(F_x_max,F_y_max,F_z_max))
+    m_att_tot = sum(Attachment_mass_calc(F_x_max,F_y_max,F_z_max)[0:3])
+
+F_x_max,F_y_max,F_z_max = Force_calculator(m_tank_dry,m_att_tot)
+D_min_upper,D_min_middle,D_min_lower = Attachment_mass_calc(F_x_max,F_y_max,F_z_max)[3:6]
+
 
 
 print("-----------------------------------------")
 print("Final Properties")
 print("-----------------------------------------\n")
 
-
+print('Final tank thickness is', round(t1*1000, 4), '[mm]') 
 print('Final tank mass', round(m_tank_dry,2), '[kg]')
 print('Final attachment mass', round(m_att_tot,2), '[kg]')
+print('Upper attachment thickness', round((D_max_crossection - D_min_upper)*1000,2), '[mm]')
+print('Middle attachment thickness', round((D_max_crossection - D_min_middle)*1000,2), '[mm]')
+print('Lower attachment thickness', round((D_max_crossection - D_min_lower)*1000,2), '[mm]')
 print('Shell Buckling', round(Sigma_cr1 *10**(-6),4), '[Mpa]')
 print('Column Buckling', round(sigma_cr *10**(-6),4), '[Mpa]')
 print('Sigma applied', round(sigma_applied *10**(-6),4), '[Mpa]')
-
-
 print("\n")
 
 
-print('The final thickness is', round(t1*1000, 4), '[mm]')  
 
 # print("Total mass is", Mass_count(mass_list), '[kg]') 
 
 
+# n_att_upper = 3
+# L_att_upper = 0.2650
 
+# n_att_midle = 3
+# L_att_middle = 0.1460
 
+# n_att_lower = 3
+# L_att_lower = 0.1725
 
-E = 1600000
-I = 1046
-R = 4
-L = 60
-total_mass = 517.42-26.654 
+# max_trans_up = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_upper  , 3 ,"Upper","H_Cylinder")[2]
+# max_trans_mid = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_middle  , 3 ,"Middle","I_Beam")[2]
+# max_trans_down = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_lower  , 3 ,"Bottom","H_Cylinder")[2]
 
+# print(max_trans_up)
+# print(max_trans_mid)
+# print(max_trans_down)
 
-p = 101325
-v = 0.333
-lamda = 1 
-stepsize = 0.0005 
 
 
 # def Mass_count(mass_list): #should get the mass of the attachments as a list, 5.4, talk to Yan. 
