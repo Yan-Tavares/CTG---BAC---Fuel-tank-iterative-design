@@ -61,11 +61,13 @@ def Minimal_variable_dimension(Rho, Sigma_yield, F_ax, F_trans, Length, Def_max_
     Sigma = Normal_Stress(F_ax,F_trans,Length,A,I,D_outer)
 
     while Sigma_yield <= Sigma:
-      Sigma = Normal_Stress(F_ax,F_trans,Length,A,I,D_outer)
-      
-      A = Def_max_dimension*(Def_max_dimension - D_inner)
-      I = (np.pi/4)*(R_outer**4 - R_inner**4)
       D_inner-= D_inner_stepsize
+
+      A = Def_max_dimension*(Def_max_dimension - D_inner)
+      I = 2* (1/12 * Def_max_dimension*(Def_max_dimension - D_inner)**3 + A * (Def_max_dimension - D_inner/2)**2)
+      
+
+      Sigma = Normal_Stress(F_ax,F_trans,Length,A,I,D_outer)
 
     Mass = Rho * Length * A
     return D_inner, Mass, Sigma
@@ -87,8 +89,8 @@ def Attachment_design(P_x,P_y,P_z,D_outer,L,n_att,att_location,att_type):
   Alpha_P = np.arctan(P_y/P_x)
 
 
-  Phi_u = np.radians(-60)
-  Phi_d = np.radians(60)
+  Phi_u = np.radians(-40)
+  Phi_d = np.radians(0)
 
   if att_location == "Upper":
     
@@ -114,7 +116,7 @@ def Attachment_design(P_x,P_y,P_z,D_outer,L,n_att,att_location,att_type):
     Abs_F_ax_list, Abs_F_trans_list, F_ax_list, F_trans_list  = Attachment_load_calculator(F_z_u,L_u_vec_list)
 
 
-  if att_location == "Midle":
+  if att_location == "Middle":
 
     num_mid = n_att
     Alpha_mid = np.radians(360/num_mid)
@@ -178,38 +180,38 @@ def Attachment_design(P_x,P_y,P_z,D_outer,L,n_att,att_location,att_type):
   return L_vec_list,Abs_F_ax_list, Abs_F_trans_list,F_ax_list, F_trans_list, D_min, Mass_att,Sigma
   
 
-D_xy_max = 0.03
-L = 0.25
-P_x = 1000
-P_y = 12000 
-P_z = 7000
+# D_xy_max = 0.03
+# L = 0.25
+# P_x = 1000
+# P_y = 12000 
+# P_z = 7000
 
-L_u_vec_list, Abs_F_ax_u_list, Abs_F_trans_u_list, F_ax_u_list, F_trans_u_list , D_u_min, Mass_u_att,Sigma_u= Attachment_design(P_x ,P_y ,P_z, D_xy_max , L  , 3 ,"Upper","H_Cylinder")
-L_mid_vec_list, Abs_F_ax_mid_list, Abs_F_trans_mid_list, F_ax_mid_list, F_trans_mid_list, D_mid_min, Mass_mid_att,Sigma_mid= Attachment_design(P_x ,P_y ,P_z, D_xy_max , L  , 3 ,"Midle","H_Cylinder")
-L_d_vec_list, Abs_F_ax_d_list, Abs_F_trans_d_list, F_ax_d_list, F_trans_d_list, D_d_min, Mass_d_att,Sigma_d= Attachment_design(P_x ,P_y ,P_z, D_xy_max , L , 3 ,"Bottom","H_Cylinder")
+# L_u_vec_list, Abs_F_ax_u_list, Abs_F_trans_u_list, F_ax_u_list, F_trans_u_list , D_u_min, Mass_u_att,Sigma_u= Attachment_design(P_x ,P_y ,P_z, D_xy_max , L  , 3 ,"Upper","H_Cylinder")
+# L_mid_vec_list, Abs_F_ax_mid_list, Abs_F_trans_mid_list, F_ax_mid_list, F_trans_mid_list, D_mid_min, Mass_mid_att,Sigma_mid= Attachment_design(P_x ,P_y ,P_z, D_xy_max , L  , 3 ,"Middle","H_Cylinder")
+# L_d_vec_list, Abs_F_ax_d_list, Abs_F_trans_d_list, F_ax_d_list, F_trans_d_list, D_d_min, Mass_d_att,Sigma_d= Attachment_design(P_x ,P_y ,P_z, D_xy_max , L , 3 ,"Bottom","H_Cylinder")
 
 
-print("-----------------------------------------")
-print("Total reaction forces")
-print("-----------------------------------------\n")
+# print("-----------------------------------------")
+# print("Total reaction forces")
+# print("-----------------------------------------\n")
 
-F_mid_total =  (np.array(F_ax_mid_list) + np.array(F_trans_mid_list)).sum(axis=0)
-F_d_total = (np.array(F_ax_d_list) + np.array(F_trans_d_list)).sum(axis=0)
+# F_mid_total =  (np.array(F_ax_mid_list) + np.array(F_trans_mid_list)).sum(axis=0)
+# F_d_total = (np.array(F_ax_d_list) + np.array(F_trans_d_list)).sum(axis=0)
 
-print(f"{'Result force from mid attachment : ':<35}")
-print(F_mid_total)
-print(f"{'Result force from bottom attachment : ':<35}")
-print(F_d_total, "\n")
+# print(f"{'Result force from mid attachment : ':<35}")
+# print(F_mid_total)
+# print(f"{'Result force from bottom attachment : ':<35}")
+# print(F_d_total, "\n")
 
-print("-----------------------------------------")
-print("Mid attachment properties")
-print("-----------------------------------------\n")
+# print("-----------------------------------------")
+# print("Mid attachment properties")
+# print("-----------------------------------------\n")
 
-print(f"{'Limit design size: ':<35}{D_xy_max:<8.5f}{'[m]':<}")
-print(f"{'Thickness: ':<35}{D_xy_max - D_mid_min:<8.5f}{'[m]':<}")
-print(f"{'Beam length: ':<35}{L:<8.5f}{'[m]':<}")
-print(f"{'Beam mass: ':<35}{ Mass_mid_att:<8.5f}{'[kg]':<}")
-print(f"{'Maximum normal stress: ':<35}{Sigma_mid*10**(-6):<8.5f}{'[Mpa]':<}")
+# print(f"{'Limit design size: ':<35}{D_xy_max:<8.5f}{'[m]':<}")
+# print(f"{'Thickness: ':<35}{D_xy_max - D_mid_min:<8.5f}{'[m]':<}")
+# print(f"{'Beam length: ':<35}{L:<8.5f}{'[m]':<}")
+# print(f"{'Beam mass: ':<35}{ Mass_mid_att:<8.5f}{'[kg]':<}")
+# print(f"{'Maximum normal stress: ':<35}{Sigma_mid*10**(-6):<8.5f}{'[Mpa]':<}")
 
 
 #----------------- DEFINE THE FORCES APPLIED TO THE ATTACHMENTS
