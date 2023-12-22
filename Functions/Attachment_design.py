@@ -26,8 +26,10 @@ def Attachment_load_calculator(Force_vector,Att_vector_list):
 
     Abs_F_ax_list.append(np.linalg.norm(F_ax))
     Abs_F_trans_list.append(np.linalg.norm(F_trans))
-  
+
   return Abs_F_ax_list, Abs_F_trans_list, F_ax_list, F_trans_list
+
+
 
 def Minimal_variable_dimension(Rho, Sigma_yield, F_ax, F_trans, Length, Def_max_dimension, att_type):
 
@@ -39,8 +41,6 @@ def Minimal_variable_dimension(Rho, Sigma_yield, F_ax, F_trans, Length, Def_max_
     A = (np.pi)*(R_outer**2 - R_inner**2)
     I = (np.pi/4)*(R_outer**4 - R_inner**4)
     Sigma = Normal_Stress(F_ax,F_trans,Length,A,I,R_outer)
-
-    print(Sigma)
     
     while Sigma_yield <= Sigma:
     
@@ -66,7 +66,7 @@ def Minimal_variable_dimension(Rho, Sigma_yield, F_ax, F_trans, Length, Def_max_
     while Sigma_yield <= Sigma:
       D_inner-= D_inner_stepsize
 
-      A = Def_max_dimension*(Def_max_dimension - D_inner)
+      A = 2* (Def_max_dimension*(Def_max_dimension - D_inner))
       I = 2* (1/12 * Def_max_dimension*(Def_max_dimension - D_inner)**3 + A * (Def_max_dimension - D_inner/2)**2)
 
       Sigma = Normal_Stress(F_ax,F_trans,Length,A,I,D_outer)
@@ -98,7 +98,7 @@ def Attachment_design(P_x,P_y,P_z,D_outer,L,n_att,att_location,att_type):
     
     num_u = n_att
     Alpha_u = np.radians(360/num_u)
-    F_z_u = np.array([0,0,P_z/(num_u*2)])
+    F_z_u = np.array([0,0,P_z/(num_u)])
 
     L_u = L
 
@@ -156,7 +156,7 @@ def Attachment_design(P_x,P_y,P_z,D_outer,L,n_att,att_location,att_type):
 
     num_d = n_att
     Alpha_d = np.radians(360/num_d)
-    F_z_d = np.array([0,0,P_z/(num_d*2)])
+    F_z_d = np.array([0,0,P_z/(num_d)])
     
     L_d = L
 

@@ -5,7 +5,7 @@ from Functions import Attachment_design as Ad
 from Functions import WP5_ParisV2 as Paris
 
 def Force_calculator(m_tank_dry,m_attachment):
-    m_SC_dry = 374
+    m_SC_dry = 374 - 76.54
     m_fuel = 143.42
 
     a_x = 3 * 9.81
@@ -30,13 +30,12 @@ def Attachment_mass_calc(F_x_max,F_y_max,F_z_max):
     n_att_midle = 3
     L_att_middle = 0.1460
 
-    n_att_lower = 3
+    n_att_lower = 4
     L_att_lower = 0.1725
 
-    m_att_upper, D_min_upper = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_upper  , 3 ,"Upper","H_Cylinder")[6]*n_att_upper, Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_upper  , 3 ,"Upper","H_Cylinder")[5]
-    m_att_middle, D_min_middle = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_middle  , 3 ,"Middle","I_Beam")[6]*n_att_midle, Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_middle  , 3 ,"Middle","I_Beam")[5]
-
-    m_att_lower, D_min_lower = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_lower  , 3 ,"Bottom","H_Cylinder")[6]*n_att_lower, Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_lower  , 3 ,"Bottom","H_Cylinder")[5]
+    m_att_upper, D_min_upper = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_upper  , n_att_upper ,"Upper","H_Cylinder")[6]*n_att_upper, Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_upper  ,  n_att_upper ,"Upper","H_Cylinder")[5]
+    m_att_middle, D_min_middle = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_middle  , n_att_midle ,"Middle","I_Beam")[6]*n_att_midle, Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_middle  , n_att_midle ,"Middle","I_Beam")[5]
+    m_att_lower, D_min_lower = Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_lower  , n_att_lower ,"Bottom","H_Cylinder")[6]*n_att_lower, Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection, L_att_lower  , n_att_lower ,"Bottom","H_Cylinder")[5]
 
     
 
@@ -107,8 +106,12 @@ for i in range (0,steps):
 
 F_x_max,F_y_max,F_z_max = Force_calculator(m_tank_dry,m_att_tot)
 D_min_upper,D_min_middle,D_min_lower = Attachment_mass_calc(F_x_max,F_y_max,F_z_max)[3:6]
+m_att_upper,m_att_middle,m_att_lower = Attachment_mass_calc(F_x_max,F_y_max,F_z_max)[0:3]
 
 
+# n_att_lower = 1
+# L_att_lower = 0.1725
+# print("Lower attachment axial load", Ad.Attachment_design(F_x_max,F_y_max,F_z_max, D_max_crossection , L_att_lower  , n_att_lower ,"Bottom","H_Cylinder")[-1])
 
 print("-----------------------------------------")
 print("Final Properties")
@@ -126,6 +129,9 @@ print('Sigma applied', round(sigma_applied *10**(-6),4), '[Mpa]')
 print("\n")
 
 
+print(m_att_upper )
+print(m_att_middle)
+print(m_att_lower)
 
 # print("Total mass is", Mass_count(mass_list), '[kg]') 
 
